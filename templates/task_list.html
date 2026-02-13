@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}My Tasks | Tracker{% endblock %}
+
+{% block content %}
+<div class="page-title">
+  <div>
+    <h1>My Tasks</h1>
+    <div class="page-sub">Search, filter, and keep things organized.</div>
+  </div>
+</div>
+
+<div class="card">
+  <form method="get" class="controls">
+    <input type="text" name="q" placeholder="Search title or description..." value="{{ request.GET.q }}">
+
+    <select name="status">
+      <option value="">All Status</option>
+      <option value="TODO" {% if request.GET.status == "TODO" %}selected{% endif %}>TODO</option>
+      <option value="IN_PROGRESS" {% if request.GET.status == "IN_PROGRESS" %}selected{% endif %}>IN PROGRESS</option>
+      <option value="DONE" {% if request.GET.status == "DONE" %}selected{% endif %}>DONE</option>
+      <option value="BLOCKED" {% if request.GET.status == "BLOCKED" %}selected{% endif %}>BLOCKED</option>
+    </select>
+
+    <label class="inline">
+      <input type="checkbox" name="overdue" value="1" {% if request.GET.overdue == "1" %}checked{% endif %}>
+      Overdue
+    </label>
+
+    <button class="btn btn-primary" type="submit">Apply</button>
+  </form>
+
+  <hr class="soft">
+
+  <div class="tasks">
+    {% for task in tasks %}
+      <div class="task {% if task.due_date and task.status != 'DONE' and task.due_date < now %}overdue{% endif %}">
+        <div>
+          <div class="task-title">
+            <a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a>
+          </div>
+
+          <div class="meta">
+            {% if task.status == "TODO" %}
+              <span class="badge todo">TODO</span>
+            {% elif task.status == "IN_PROGRESS" %}
+              <span class="badge inprogress">IN PROGRESS</span>
+            {% elif task.status == "DONE" %}
+              <span class="badge done">DONE</span>
+            {% elif task.status == "BLOCKED" %}
+              <span class="badge blocked">BLOCKED</span>
+            {% endif %}
+
+            {% if task.due_date %}
+              <span>Due: {{ task.due_date|date:"D, M j" }}</span>
+            {% else %}
+              <span>No due date</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center;">
+          <a class="btn small" href="{% url 'task_edit' task.pk %}">Edit</a>
+
+          <form method="post" action="{% url 'task_archive' task.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-danger small" type="submit">Archive</button>
+          </form>
+        </div>
+      </div>
+    {% empty %}
+      <div class="empty">
+        <h3 style="margin:0; color: var(--text);">No tasks yet 🙂</h3>
+        <p>Create your first task and start tracking.</p>
+        <a class="btn btn-primary" href="{% url 'task_create' %}">+ Create Task</a>
+      </div>
+    {% endfor %}
+
+    {% if is_paginated %}
+  <div style="display:flex; gap:10px; justify-content:center; margin-top: 16px;">
+    {% if page_obj.has_previous %}
+      <a class="btn" href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&status={{ request.GET.status }}&overdue={{ request.GET.overdue }}">← Prev</a>
+    {% endif %}
+
+    <span class="btn btn-ghost">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+      <a class="btn" href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&status={{ request.GET.status }}&overdue={{ request.GET.overdue }}">Next →</a>
+    {% endif %}
+  </div>
+{% endif %}
+
+  </div>
+</div>
+{% endblock %}

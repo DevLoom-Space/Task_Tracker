@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Edit Task{% else %}Create Task{% endif %} | Tracker{% endblock %}
+
+{% block content %}
+<div class="page-title">
+  <div>
+    <h1>{% if object %}Edit Task{% else %}Create Task{% endif %}</h1>
+    <div class="page-sub">Keep it clear and simple.</div>
+  </div>
+</div>
+
+<div class="card">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div style="display:flex; gap:10px; margin-top: 10px;">
+      <button class="btn btn-primary" type="submit">Save</button>
+      <a class="btn" href="{% url 'task_list' %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Tracker{% endblock %}
+
+{% block content %}
+<style>
+  .card-link{
+    text-decoration:none;
+    color:inherit;
+    display:block;
+  }
+  .card-link .task{
+    cursor:pointer;
+  }
+  .card-link .task:hover{
+    transform: translateY(-1px);
+  }
+</style>
+
+<div class="page-title">
+  <div>
+    <h1>Dashboard 📌</h1>
+    <div class="page-sub">A quick snapshot of your tasks.</div>
+  </div>
+
+  <div style="display:flex; gap:10px; align-items:center;">
+    <a class="btn" href="{% url 'task_list' %}">View Tasks</a>
+    <a class="btn btn-primary" href="{% url 'task_create' %}">+ New Task</a>
+  </div>
+</div>
+
+<div class="card">
+  <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px;">
+
+    <!-- Active -->
+    <a class="card-link" href="{% url 'task_list' %}">
+      <div class="task">
+        <div>
+          <div class="task-title">Active</div>
+          <div class="page-sub">All non-archived tasks</div>
+        </div>
+        <div class="badge todo">{{ total_active }}</div>
+      </div>
+    </a>
+
+    <!-- Completed -->
+    <a class="card-link" href="{% url 'task_list' %}?status=DONE">
+      <div class="task">
+        <div>
+          <div class="task-title">Completed</div>
+          <div class="page-sub">Done tasks</div>
+        </div>
+        <div class="badge done">{{ done_count }}</div>
+      </div>
+    </a>
+
+    <!-- Overdue -->
+    <a class="card-link" href="{% url 'task_list' %}?overdue=1">
+      <div class="task">
+        <div>
+          <div class="task-title">Overdue</div>
+          <div class="page-sub">Due date passed</div>
+        </div>
+        <div class="badge blocked">{{ overdue_count }}</div>
+      </div>
+    </a>
+
+    <!-- To Do -->
+    <a class="card-link" href="{% url 'task_list' %}?status=TODO">
+      <div class="task">
+        <div>
+          <div class="task-title">To Do</div>
+          <div class="page-sub">Not started</div>
+        </div>
+        <div class="badge todo">{{ todo_count }}</div>
+      </div>
+    </a>
+
+    <!-- In Progress -->
+    <a class="card-link" href="{% url 'task_list' %}?status=IN_PROGRESS">
+      <div class="task">
+        <div>
+          <div class="task-title">In Progress</div>
+          <div class="page-sub">Currently working</div>
+        </div>
+        <div class="badge inprogress">{{ in_progress_count }}</div>
+      </div>
+    </a>
+
+    <!-- Blocked -->
+    <a class="card-link" href="{% url 'task_list' %}?status=BLOCKED">
+      <div class="task">
+        <div>
+          <div class="task-title">Blocked</div>
+          <div class="page-sub">Needs help</div>
+        </div>
+        <div class="badge blocked">{{ blocked_count }}</div>
+      </div>
+    </a>
+
+    <!-- Archived (full width) -->
+    <a class="card-link" href="{% url 'archived_tasks' %}" style="grid-column: 1 / -1;">
+      <div class="task">
+        <div>
+          <div class="task-title">Archived</div>
+          <div class="page-sub">Hidden tasks</div>
+        </div>
+        <div class="badge">{{ total_archived }}</div>
+      </div>
+    </a>
+
+  </div>
+
+  <hr class="soft">
+
+  <div class="page-title" style="margin:0 0 10px;">
+    <div>
+      <h1 style="font-size:18px; margin:0;">Due Soon (Next 7 days)</h1>
+      <div class="page-sub">Stay ahead before deadlines bite 😄</div>
+    </div>
+  </div>
+
+  <div class="tasks">
+    {% for task in due_soon %}
+      <div class="task">
+        <div>
+          <div class="task-title">
+            <a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a>
+          </div>
+          <div class="meta">
+            <span class="badge inprogress">Due</span>
+            <span>{{ task.due_date|date:"D, M j" }}</span>
+          </div>
+        </div>
+        <a class="btn small" href="{% url 'task_detail' task.pk %}">Open</a>
+      </div>
+    {% empty %}
+      <div class="empty">
+        <p style="margin:0;">No tasks due soon 🎉</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}{{ task.title }} | Tracker{% endblock %}
+
+{% block content %}
+<div class="page-title">
+  <div>
+    <h1>{{ task.title }}</h1>
+    <div class="page-sub">Full task details and quick actions.</div>
+  </div>
+
+  <div style="display:flex; gap:10px; align-items:center;">
+    <a class="btn" href="{% url 'task_edit' task.pk %}">Edit</a>
+
+    <form method="post" action="{% url 'task_archive' task.pk %}">
+      {% csrf_token %}
+      <button class="btn btn-danger" type="submit">Archive</button>
+    </form>
+
+    <form method="post" action="{% url 'task_toggle_done' task.pk %}">
+      {% csrf_token %}
+      {% if task.status == "DONE" %}
+        <button class="btn" type="submit">Undo Done</button>
+      {% else %}
+        <button class="btn btn-primary" type="submit">Mark Done</button>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="meta" style="margin-bottom: 10px;">
+    {% if task.status == "TODO" %}
+      <span class="badge todo">TODO</span>
+    {% elif task.status == "IN_PROGRESS" %}
+      <span class="badge inprogress">IN PROGRESS</span>
+    {% elif task.status == "DONE" %}
+      <span class="badge done">DONE</span>
+    {% elif task.status == "BLOCKED" %}
+      <span class="badge blocked">BLOCKED</span>
+    {% endif %}
+  </div>
+
+  <p style="margin:0 0 10px;"><b>Description</b></p>
+  <p style="margin:0; color: var(--muted);">
+    {{ task.description|default:"(No description)" }}
+  </p>
+
+  <hr class="soft">
+
+<div class="meta">
+  <span><b>Due:</b>
+    {{ task.due_date|date:"D, M j"|default:"(No due date)" }}
+  </span>
+
+  <span><b>Created:</b>
+    {{ task.created_at|date:"D, M j" }}
+  </span>
+
+  <span><b>Updated:</b>
+    {{ task.updated_at|date:"D, M j" }}
+  </span>
+
+  <span><b>Completed:</b>
+    {{ task.completed_at|date:"D, M j"|default:"(Not completed)" }}
+  </span>
+</div>
+
+
+  <hr class="soft">
+
+  <a class="btn btn-ghost" href="{% url 'task_list' %}">← Back to tasks</a>
+</div>
+{% endblock %}

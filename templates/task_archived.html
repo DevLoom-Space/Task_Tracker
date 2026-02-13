@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Archived Tasks | Tracker{% endblock %}
+
+{% block content %}
+<div class="page-title">
+  <div>
+    <h1>Archived Tasks</h1>
+    <div class="page-sub">
+      Restore tasks anytime. Delete permanently only when you’re 100% sure.
+    </div>
+  </div>
+
+  <a class="btn" href="{% url 'task_list' %}">← Back to active</a>
+</div>
+
+<div class="card">
+  <div class="tasks">
+    {% for task in tasks %}
+      <div class="task">
+        <div>
+          <div class="task-title">{{ task.title }}</div>
+
+          <div class="meta">
+            {% if task.status == "TODO" %}
+              <span class="badge todo">TODO</span>
+            {% elif task.status == "IN_PROGRESS" %}
+              <span class="badge inprogress">IN PROGRESS</span>
+            {% elif task.status == "DONE" %}
+              <span class="badge done">DONE</span>
+            {% elif task.status == "BLOCKED" %}
+              <span class="badge blocked">BLOCKED</span>
+            {% endif %}
+
+            {% if task.due_date %}
+              <span>Due: {{ task.due_date|date:"D, M j" }}</span>
+            {% else %}
+              <span>No due date</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <a class="btn small" href="{% url 'task_detail' task.pk %}">View</a>
+
+          <form method="post" action="{% url 'task_restore' task.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-primary small" type="submit">Restore</button>
+          </form>
+
+          <!-- Permanent delete (danger) -->
+          <form method="post" action="{% url 'task_delete' task.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-danger small" type="submit"
+              onclick="return confirm('Delete permanently? This cannot be undone.');">
+              Delete
+            </button>
+          </form>
+        </div>
+      </div>
+    {% empty %}
+      <div class="empty">
+        <h3 style="margin:0; color: var(--text);">No archived tasks 🙂</h3>
+        <p>Archived tasks will appear here.</p>
+        <a class="btn btn-primary" href="{% url 'task_list' %}">Back to tasks</a>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if is_paginated %}
+    <div style="display:flex; gap:10px; justify-content:center; margin-top: 16px; flex-wrap:wrap;">
+      {% if page_obj.has_previous %}
+        <a class="btn" href="?page={{ page_obj.previous_page_number }}">← Prev</a>
+      {% endif %}
+
+      <span class="btn btn-ghost">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+      {% if page_obj.has_next %}
+        <a class="btn" href="?page={{ page_obj.next_page_number }}">Next →</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

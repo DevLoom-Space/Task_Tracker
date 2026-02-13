@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Sign up | Tracker{% endblock %}
+
+{% block content %}
+<div class="page-title">
+  <div>
+    <h1>Create your workspace 🚀</h1>
+    <div class="page-sub">
+      Why forget when you have a Task Tracker? Plan smarter, stay focused, and finish tasks with ease.
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <form method="post">
+    {% csrf_token %}
+
+    {{ form.username.label_tag }}
+    {{ form.username }}
+    <div class="page-sub">{{ form.username.help_text }}</div>
+
+    <div style="height:12px;"></div>
+
+    <div style="position: relative;">
+      {{ form.password1.label_tag }}
+      {{ form.password1 }}
+      <button type="button"
+              onclick="togglePassword('id_password1', this)"
+              aria-label="Toggle password visibility"
+              style="position:absolute; right:10px; top:38px; border:0; background:transparent; cursor:pointer; font-size:16px;">
+        👁
+      </button>
+    </div>
+
+    <details style="margin-top:8px;">
+      <summary class="page-sub" style="cursor:pointer;">Password requirements</summary>
+      <div class="page-sub" style="margin-top:8px;">
+        {{ form.password1.help_text|safe }}
+      </div>
+    </details>
+
+    <div style="height:12px;"></div>
+
+    <div style="position: relative;">
+      {{ form.password2.label_tag }}
+      {{ form.password2 }}
+      <button type="button"
+              onclick="togglePassword('id_password2', this)"
+              aria-label="Toggle password visibility"
+              style="position:absolute; right:10px; top:38px; border:0; background:transparent; cursor:pointer; font-size:16px;">
+        👁
+      </button>
+    </div>
+
+    <div class="page-sub">{{ form.password2.help_text }}</div>
+
+    {% if form.errors %}
+      <hr class="soft">
+      <div class="page-sub" style="color: var(--danger);">
+        Please fix the errors below.
+      </div>
+      {{ form.errors }}
+    {% endif %}
+
+    <div style="margin-top: 12px; display:flex; gap:10px; align-items:center;">
+      <button class="btn btn-primary" type="submit">Create account</button>
+      <a class="btn" href="{% url 'login' %}">Login</a>
+    </div>
+  </form>
+
+  <hr class="soft">
+  <p class="page-sub" style="margin:0;">
+    Already have an account? <a href="{% url 'login' %}">Login</a>
+  </p>
+</div>
+
+<script>
+  function togglePassword(fieldId, btn) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+
+    const isPassword = field.type === "password";
+    field.type = isPassword ? "text" : "password";
+
+    // Change icon for a nicer UX
+    btn.textContent = isPassword ? "🙈" : "👁";
+  }
+</script>
+{% endblock %}
