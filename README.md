@@ -1,5 +1,9 @@
+## 📌 Project Challenge
 
-#project url - https://github.com/DevLoom-Space/Task_Tracker
+This project is a solution to the Roadmap.sh Task Tracker challenge:
+
+https://roadmap.sh/projects/task-tracker
+
 
 
 📌 Task Tracker – Django
